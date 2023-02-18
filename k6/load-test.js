@@ -2,6 +2,7 @@ import http from 'k6/http';
 import {check, fail} from 'k6';
 import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 
+// シナリオの設定が入っている
 export const options = {
   thresholds: {
       http_req_duration: ['p(95)<1000'], // 95% のリクエストは 1000ms (1s) 以内に収める
@@ -14,6 +15,7 @@ export const options = {
           gracefulStop: '10s',
 
           preAllocatedVUs: 20,
+          //並行実行数
           stages: [
               // target: 1 秒あたりの load_test 関数の実行回数の目標値
               // duration: target 到達までにかかる時間

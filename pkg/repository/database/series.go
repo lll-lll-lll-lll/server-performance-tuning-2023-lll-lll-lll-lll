@@ -100,6 +100,27 @@ func (e *Series) Get(ctx context.Context, id string) (*entity.Series, error) {
 func (e *Series) BatchGet(ctx context.Context, ids []string) (entity.SeriesMulti, error) {
 	ctx, span := tracer.Start(ctx, "database.Series#BatchGet")
 	defer span.End()
+	rows, err := e.db.QueryContext(ctx, `SELECT seriesID, displayName FROM series WHERE seriesID IN (?`+strings.Repeat(",?", len(ids)-1)+`)`, convertStringsToAnys(ids)...)
+	if err != nil {
+		return nil, errcode.New(err)
+	}
+
+	var seriesMulti entity.SeriesMulti
+	for rows.Next() {
+		var series entity.Series
+		err = rows.Scan(&series.ID)
+		if err != nil {
+			break
+		}
+		seriesMulti = append(seriesMulti, &series)
+	}
+
+	if closeErr := rows.Close(); closeErr != nil {
+		return nil, errcode.New(closeErr)
+	}
+	if err != nil {
+		return nil, errcode.New(err)
+	}
 
 	return nil, errcode.New(errors.New("not implemtented yet"))
 }

@@ -22,3 +22,11 @@ func (s SeriesMulti) GenreIDs() []string {
 	}
 	return ret
 }
+
+func (s SeriesMulti) SeriesIDs() []string {
+	ret := make([]string, 0, len(s))
+	for i := range s {
+		ret = append(ret, s[i].ID)
+	}
+	return ret
+}

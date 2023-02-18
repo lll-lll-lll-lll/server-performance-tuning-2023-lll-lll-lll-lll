@@ -13,3 +13,11 @@ type Seasons []*Season
 type ListSeasonsResponse struct {
 	Seasons Seasons `json:"seasons"`
 }
+
+func (s Seasons) SeasonIDs() []string {
+	ret := make([]string, 0, len(s))
+	for i := range s {
+		ret = append(ret, s[i].ID)
+	}
+	return ret
+}

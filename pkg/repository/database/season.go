@@ -122,5 +122,27 @@ func (e *Season) BatchGet(ctx context.Context, ids []string) (entity.Seasons, er
 	ctx, span := tracer.Start(ctx, "database.Season#BatchGet")
 	defer span.End()
 
+	rows, err := e.db.QueryContext(ctx, `SELECT seasonID, displayName FROM seasons WHERE seasonID IN (?`+strings.Repeat(",?", len(ids)-1)+`)`, convertStringsToAnys(ids)...)
+	if err != nil {
+		return nil, errcode.New(err)
+	}
+
+	var seasons entity.Seasons
+	for rows.Next() {
+		var season entity.Season
+		err = rows.Scan(&season.ID, &season.DisplayName)
+		if err != nil {
+			break
+		}
+		seasons = append(seasons, &season)
+	}
+
+	if closeErr := rows.Close(); closeErr != nil {
+		return nil, errcode.New(closeErr)
+	}
+	if err != nil {
+		return nil, errcode.New(err)
+	}
+
 	return nil, errcode.New(errors.New("not implemtented yet"))
 }
